@@ -52,7 +52,7 @@
             max-width: 90%;
         }
 
-        #pontuacao {
+        #pontuacao, #tempo {
             background-color: rgba(165, 42, 42, 0.521);
             border-radius: 25px;
             margin-top: 5px;
@@ -68,7 +68,7 @@
                 max-width: 600px;
             }
 
-            #pontuacao {
+            #pontuacao, #tempo {
                 font-size: 25px;
             }
 
@@ -84,6 +84,7 @@
     <div id="div">
         Jogo da Paciência - Pegue a Dona Mosca e a Abelha! <br>
         <div id="pontuacao">Pontuação: 0</div>
+        <div id="tempo">Tempo: 60s</div>
     </div>
 
     <div id="exemplo_1">
@@ -99,10 +100,33 @@
         let velocidade = 1000;
         let personagem = "mosca";
         let tamanho = 50;
+        let tempoLimite = 60; // Aumentei para 60 segundos, já que o tempo não reinicia
+        let tempoRestante = tempoLimite;
+        let intervalId;
+
+        function atualizarTempo() {
+            $("#tempo").text(`Tempo: ${tempoRestante}s`);
+            tempoRestante--;
+            if (tempoRestante < 0) {
+                clearInterval(intervalId);
+                Swal.fire({
+                    title: 'Tempo Esgotado!',
+                    text: `Você chegou até a fase ${fase} com ${pontos} pontos!`,
+                    icon: 'info',
+                    confirmButtonText: 'Jogar Novamente'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                });
+            }
+        }
 
         Swal.fire("Bem-vindo ao Jogo da Dona Mosca! Pegue a mosca para avançar de fase.");
 
         $(document).ready(function () {
+            intervalId = setInterval(atualizarTempo, 1000);
+
             function aumentarDificuldade() {
                 fase++;
                 velocidade -= 200;
@@ -119,6 +143,8 @@
                     personagem = "mosca";
                     $("#mosca img").attr("src", "imagens/fly.gif");
                 }
+
+                // O tempo não é mais reiniciado aqui
             }
 
             function moverMosca() {
