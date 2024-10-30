@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Jogo da mosca</title>
+    <style>
+        @font-face {
+            font-family: 'fonte01';
+            src: url('fonte01.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'fonte01', sans-serif;
+            background-image: url('imagens/sala.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #mosca {
+            position: absolute;
+        }
+
+        #mosca img {
+            width: 10vw;
+            height: 10vw;
+            max-width: 50px;
+            max-height: 50px;
+        }
+
+        #exemplo_1 {
+            width: 100%;
+            height: 80vh;
+            cursor: url(imagens/cursor.cur), auto;
+        }
+
+        #div {
+            background-color: crimson;
+            border-radius: 25px;
+            margin: 10px;
+            padding: 10px;
+            color: white;
+            font-size: 5vw;
+            max-width: 90%;
+        }
+
+        #pontuacao {
+            background-color: rgba(165, 42, 42, 0.521);
+            border-radius: 25px;
+            margin-top: 5px;
+            padding: 10px;
+            font-size: 4vw;
+            color: white;
+            display: inline-block;
+        }
+
+        @media (min-width: 768px) {
+            #div {
+                font-size: 35px;
+                max-width: 600px;
+            }
+
+            #pontuacao {
+                font-size: 25px;
+            }
+
+            #mosca img {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="div">
+        Jogo da Paciência - Pegue a Dona Mosca e a Abelha! <br>
+        <div id="pontuacao">Pontuação: 0</div>
+    </div>
+
+    <div id="exemplo_1">
+        <div id="mosca">
+            <img src="imagens/fly.gif" alt="Mosca ou Abelha">
+        </div>
+    </div>
+
+    <script>
+        let contador = 0;
+        let fase = 1;
+        let pontos = 0;
+        let velocidade = 1000;
+        let personagem = "mosca";
+        let tamanho = 50;
+
+        Swal.fire("Bem-vindo ao Jogo da Dona Mosca! Pegue a mosca para avançar de fase.");
+
+        $(document).ready(function () {
+            function aumentarDificuldade() {
+                fase++;
+                velocidade -= 200;
+                tamanho -= 5;
+                if (tamanho < 20) tamanho = 20;
+
+                $("#mosca img").css({ width: tamanho + "px", height: tamanho + "px" });
+
+                if (fase % 2 === 0) {
+                    personagem = "abelha";
+                    $("#mosca img").attr("src", "imagens/abelha.gif");
+                    Swal.fire(`Agora é uma abelha! Pegue-a para continuar fase.`);
+                } else {
+                    personagem = "mosca";
+                    $("#mosca img").attr("src", "imagens/fly.gif");
+                }
+            }
+
+            function moverMosca() {
+                let maxWidth = $(window).width() - $("#mosca").width();
+                let maxHeight = $(window).height() - $("#mosca").height();
+                let x = Math.random() * maxWidth;
+                let y = Math.random() * maxHeight;
+                $("#mosca").animate({ left: x, top: y }, velocidade);
+            }
+
+            $("#mosca").on('mouseenter touchstart', function (e) {
+                e.preventDefault();
+                contador++;
+                pontos += 10;
+                $("#pontuacao").text("Pontuação: " + pontos);
+
+                if (contador === 5) {
+                    Swal.fire(`Parabéns! Você completou a fase ${fase}.`);
+                    contador = 0;
+                    aumentarDificuldade();
+                }
+
+                moverMosca();
+            });
+
+            moverMosca();
+
+            $(window).resize(function() {
+                moverMosca();
+            });
+        });
+    </script>
+</body>
+
+</html>
